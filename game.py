@@ -16,7 +16,8 @@ class Game:
         self.all_monsters = pygame.sprite.Group() # groupe de monstres
         self.pressed = {}
         self.spawn_monster()
-        
+        self.spawn_monster()
+
     def check_collision(self, sprite, group):
         return pygame.sprite.spritecollide(sprite, group, False, pygame.sprite.collide_mask)
     
@@ -31,7 +32,7 @@ class Game:
         
     def commandes(self):
         if self.pressed.get(pygame.K_RIGHT) and self.pressed.get(pygame.K_LEFT):
-            self.player.health = self.player.health + 1 if self.player.health < self.player.max_health else self.player.health
+            self.player.health = self.player.health + 0.5 if self.player.health < self.player.max_health else self.player.health
         elif self.pressed.get(pygame.K_RIGHT) and self.walls('right'):
             self.player.move('right')
         elif self.pressed.get(pygame.K_LEFT) and self.walls('left'):
@@ -40,10 +41,15 @@ class Game:
     def initialisation(self):
         self.screen.blit(self.background, (0, -200)) #arriere plan
         self.screen.blit(self.player.image, self.player.rect) #appliquer l'image du player
+        
+        self.player.update_health_bar(self.screen) # actualiser la bar de vie du joueur
+        
         for projectile in self.player.all_projectiles:
             projectile.move() # mouvement des projectiles
         for monster in self.all_monsters:
             monster.forward() # avancement des monstres
+            monster.update_health_bar(self.screen)
+            
         self.player.all_projectiles.draw(self.screen) #appliquer l'ensemble des images du groupe de projectiles
         self.all_monsters.draw(self.screen) #appliquer l'ensemble des images du groupe de monstres
         self.commandes()
@@ -60,7 +66,8 @@ class Game:
                 elif event.type == pygame.KEYDOWN: #touche appuyé
                     self.pressed[event.key] = True
                     if event.key == pygame.K_SPACE: 
-                        self.player.launch_projectile() # lancement du projectile
+                        if not self.pressed.get(pygame.K_RIGHT) or not self.pressed.get(pygame.K_LEFT):
+                            self.player.launch_projectile() # lancement du projectile
                     
                 elif event.type == pygame.KEYUP: #touche non appuyé
                     self.pressed[event.key] = False

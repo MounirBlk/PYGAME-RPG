@@ -17,6 +17,14 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 200
         self.rect.y = 500
         
+    def get_damage(self, amount):
+        if self.health - amount > amount: # verifier le nombre de points de vie
+            self.health -= amount # infliger des dégats au player
+        
+    def update_health_bar(self, surface):
+        pygame.draw.rect(surface, (60, 63, 60), [self.rect.x + 50, self.rect.y + 25, self.max_health, 7]) # dessine le bg de la barre de vie
+        pygame.draw.rect(surface, (111, 210, 46), [self.rect.x + 50, self.rect.y + 25, self.health, 7]) # dessine la barre de vie
+        
     def launch_projectile(self):
         self.all_projectiles.add(Projectile(self))
         
