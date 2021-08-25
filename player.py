@@ -4,9 +4,9 @@ from pygame import * #a retirer
 from projectile import Projectile#a retirer
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, screen):
+    def __init__(self, game):
         super().__init__()
-        self.screen = screen
+        self.game = game
         self.health = 100
         self.max_health = 100
         self.attack = 10
@@ -21,8 +21,8 @@ class Player(pygame.sprite.Sprite):
         self.all_projectiles.add(Projectile(self))
         
     def move(self, direction):
-        self.facing = direction
-        if direction == 'right':
-            self.rect.x += self.speed
+        if not self.game.check_collision(self, self.game.all_monsters): # si le joueur n'est pas en collision avec un monstre
+            if direction == 'right':
+                self.rect.x += self.speed
         if direction == 'left':
             self.rect.x -= self.speed

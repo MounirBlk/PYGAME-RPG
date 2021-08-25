@@ -24,8 +24,10 @@ class Projectile(pygame.sprite.Sprite):
         self.player.all_projectiles.remove(self) # supprimer le projectile 
         
     def move(self):
-        self.rect.x += self.speed
+        self.rect.x += self.speed # deplacement du projectile
         self.rotate()
-        if self.rect.x > self.player.screen.get_width():# verifier si notre projectile n'est plus présent sur l'ecran
+        if self.player.game.check_collision(self, self.player.game.all_monsters): # verifier si le projectile entre en collision avec un monstre
+            self.remove() 
+        if self.rect.x > self.player.game.screen.get_width():# verifier si notre projectile n'est plus présent sur l'ecran
             self.remove()
         

@@ -2,14 +2,27 @@
 import pygame 
 from pygame import * #a retirer
 from player import Player
+from monster import Monster
+
 class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((1080, 720)) #Creer la fenetre du jeu
         pygame.display.set_caption("PyGame - Comet fall")
         self.background = pygame.image.load('assets/bg.jpg')
-        self.player = Player(self.screen)
+        self.all_persons = pygame.sprite.Group()
+        self.player = Player(self)
+        self.all_persons.add(self.player)
+        self.all_monsters = pygame.sprite.Group() # groupe de monstres
         self.pressed = {}
+        self.spawn_monster()
+        
+    def check_collision(self, sprite, group):
+        return pygame.sprite.spritecollide(sprite, group, False, pygame.sprite.collide_mask)
+    
+    def spawn_monster(self):
+        self.all_monsters.add(Monster(self))
+        
     def walls(self, direction):
         if direction == 'right':
             return True if self.player.rect.x + self.player.rect.width < self.screen.get_width() else False
@@ -26,10 +39,13 @@ class Game:
             
     def initialisation(self):
         self.screen.blit(self.background, (0, -200)) #arriere plan
-        self.screen.blit(self.player.image, self.player.rect)#appliquer l'image du player
+        self.screen.blit(self.player.image, self.player.rect) #appliquer l'image du player
         for projectile in self.player.all_projectiles:
-            projectile.move()
+            projectile.move() # mouvement des projectiles
+        for monster in self.all_monsters:
+            monster.forward() # avancement des monstres
         self.player.all_projectiles.draw(self.screen) #appliquer l'ensemble des images du groupe de projectiles
+        self.all_monsters.draw(self.screen) #appliquer l'ensemble des images du groupe de monstres
         self.commandes()
         pygame.display.flip() #mettre a jour l'ecran
         
