@@ -3,7 +3,9 @@ import pygame
 from pygame import * #a retirer
 from player import Player
 from monster import Monster
+from comet_event import CometFallEvent
 import math
+import random
 
 class Game:
     def __init__(self):
@@ -16,17 +18,20 @@ class Game:
         self.all_persons = pygame.sprite.Group()
         self.player = Player(self)
         self.all_persons.add(self.player)
+        self.comet_event = CometFallEvent(self) # evenement des comets
         self.all_monsters = pygame.sprite.Group() # groupe de monstres
         self.pressed = {}
         
     def start(self):
         self.is_playing = True
-        self.spawn_monster()
-        self.spawn_monster()
+        for monster in range(2):
+            self.spawn_monster()
         
     def game_over(self): # remettre le jeu à neuf
         self.all_monsters = pygame.sprite.Group() 
+        self.comet_event.all_comets = pygame.sprite.Group() 
         self.player.health = self.player.max_health
+        self.comet_event.reset_percent()
         self.is_playing = False
         
     def init_menu(self):
@@ -65,15 +70,19 @@ class Game:
     def update(self):
         self.screen.blit(self.player.image, self.player.rect) #appliquer l'image du player
         self.player.update_health_bar(self.screen) # actualiser la bar de vie du joueur
+        self.comet_event.update_bar(self.screen) # actualiser la barre d'evenement du jeu
         
         for projectile in self.player.all_projectiles:
             projectile.move() # mouvement des projectiles
         for monster in self.all_monsters:
             monster.forward() # avancement des monstres
-            monster.update_health_bar(self.screen)
-            
+            monster.update_health_bar(self.screen) # update de la bare de vie
+        for comet in self.comet_event.all_comets:
+            comet.fall() # avancement des monstres
+
         self.player.all_projectiles.draw(self.screen) #appliquer l'ensemble des images du groupe de projectiles
         self.all_monsters.draw(self.screen) #appliquer l'ensemble des images du groupe de monstres
+        self.comet_event.all_comets.draw(self.screen) #appliquer l'ensemble des images du groupe de comets
         self.commandes()
         
     def run(self):  
@@ -99,7 +108,7 @@ class Game:
                 elif event.type == pygame.KEYUP: #touche non appuyé
                     self.pressed[event.key] = False
                     
-                elif event.type == pygame.MOUSEBUTTONDOWN: # verification pour savoir si la souris est en collision avec le button play
+                elif event.type == pygame.MOUSEBUTTONDOWN and self.is_playing == False: # verification pour savoir si la souris est en collision avec le button play
                     if self.play_button_rect.collidepoint(event.pos):
                         self.start() # lancer le jeu
                         
