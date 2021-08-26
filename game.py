@@ -4,6 +4,7 @@ from pygame import * #a retirer
 from player import Player
 from monster import *
 from comet_event import CometFallEvent
+from sounds import SoundManager
 import math
 import random
 
@@ -21,6 +22,9 @@ class Game:
         self.all_persons.add(self.player)
         self.comet_event = CometFallEvent(self) # evenement des comets
         self.all_monsters = pygame.sprite.Group() # groupe de monstres
+        self.sound_manager = SoundManager() # Sound
+        self.font = pygame.font.Font('assets/fonts//PottaOne-Regular.ttf', 25) # pygame.font.SysFont('Arial', 16) 
+        self.score = 0
         self.pressed = {}
         
     def start(self):
@@ -29,12 +33,17 @@ class Game:
             self.spawn_monster(Mummy)
         self.spawn_monster(Alien)
         
+    def add_score(self, points = 10):
+        self.score += points
+        
     def game_over(self): # remettre le jeu à neuf
         self.all_monsters = pygame.sprite.Group() 
         self.comet_event.all_comets = pygame.sprite.Group() 
         self.player.health = self.player.max_health
         self.comet_event.reset_percent()
         self.is_playing = False
+        self.score = 0
+        self.sound_manager.play('game_over')
         
     def init_menu(self):
         self.banner = pygame.image.load('assets/banner.png')
@@ -70,10 +79,12 @@ class Game:
             self.player.move('left')
             
     def update(self):
-        self.screen.blit(self.player.image, self.player.rect) #appliquer l'image du player
-        self.player.update_health_bar(self.screen) # actualiser la bar de vie du joueur
-        self.comet_event.update_bar(self.screen) # actualiser la barre d'evenement du jeu
-        self.player.update_animation() # actualiser l'animation du player
+        score_text = self.font.render(f'Score : {self.score}', 1, (255, 255, 255)) # Afficher le score sur l'ecran
+        self.screen.blit(score_text, (20, 20))
+        self.screen.blit(self.player.image, self.player.rect) # Appliquer l'image du player
+        self.player.update_health_bar(self.screen) # Actualiser la bar de vie du joueur
+        self.comet_event.update_bar(self.screen) # Actualiser la barre d'evenement du jeu
+        self.player.update_animation() # Actualiser l'animation du player
         
         for projectile in self.player.all_projectiles:
             projectile.move() # mouvement des projectiles
@@ -106,15 +117,19 @@ class Game:
                 elif event.type == pygame.KEYDOWN: #touche appuyé
                     self.pressed[event.key] = True
                     if event.key == pygame.K_SPACE: 
-                        if not self.pressed.get(pygame.K_RIGHT) or not self.pressed.get(pygame.K_LEFT):
-                            self.player.launch_projectile() # lancement du projectile
-                    
+                        if self.is_playing:
+                            if not self.pressed.get(pygame.K_RIGHT) or not self.pressed.get(pygame.K_LEFT):
+                                self.player.launch_projectile() # lancement du projectile
+                        else:
+                            self.start() # lancer le jeu
+                            self.sound_manager.play('click')                    
                 elif event.type == pygame.KEYUP: #touche non appuyé
                     self.pressed[event.key] = False
                     
                 elif event.type == pygame.MOUSEBUTTONDOWN and self.is_playing == False: # verification pour savoir si la souris est en collision avec le button play
                     if self.play_button_rect.collidepoint(event.pos):
                         self.start() # lancer le jeu
+                        self.sound_manager.play('click')
                         
             clock.tick(FPS) #SET FPS
         pygame.quit() #Quit

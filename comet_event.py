@@ -8,7 +8,7 @@ class CometFallEvent:
     def __init__(self, game):
         self.game = game
         self.percent = 0
-        self.percent_speed = 5
+        self.percent_speed = 50
         self.all_comets = pygame.sprite.Group() # definir un groupe de sprite pour les cometes
         self.fall_mode = False
         

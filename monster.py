@@ -15,8 +15,12 @@ class Monster(animation.AnimateSprite):
         self.rect = self.image.get_rect()
         self.rect.x = math.ceil(self.game.screen.get_width() * 0.9) - random.randint(0, 150)
         self.rect.y = math.ceil(self.game.player.rect.y + (self.game.player.rect.y / 12.5)) - offset
+        self.loot_amount = 10
         self.speed = random.randint(2, 4)
         self.start_animation()
+    
+    def set_loot_amount(self, amount):
+        self.loot_amount = amount
         
     def get_damage(self, amount):
         self.health -= amount # infliger des dégats au monstre
@@ -27,14 +31,15 @@ class Monster(animation.AnimateSprite):
             self.health = self.max_health
             self.speed = random.randint(2, 3)'''
             self.game.all_monsters.remove(self)
-            tabTypeMonstersClass = [Mummy, Alien]
-            typeMonsterClass = tabTypeMonstersClass[random.randint(0, len(tabTypeMonstersClass) - 1)]
-            self.game.spawn_monster(typeMonsterClass)
-            
-            if self.game.comet_event.is_full_loaded(): # check si la barre d'evement de comet est chargé
+            self.game.add_score(self.loot_amount)
+            if self.game.comet_event.is_full_loaded(): # check si la barre d'evenement de comet est chargé
                 self.game.all_monsters.remove(self)
                 self.game.comet_event.attempt_fall() # declencher la pluie de cometes
-
+            else:
+                tabTypeMonstersClass = [Mummy, Alien]
+                typeMonsterClass = tabTypeMonstersClass[random.randint(0, len(tabTypeMonstersClass) - 1)]
+                self.game.spawn_monster(typeMonsterClass)
+                
     def update_animation(self):
         self.animate(loop = True) # method from Class AnimateSprite -> animation.py
         
@@ -52,7 +57,7 @@ class Monster(animation.AnimateSprite):
 class Mummy(Monster):
     def __init__(self, game):
         super().__init__(game, 'mummy', (130, 130))
-        
+        self.set_loot_amount(20)
 class Alien(Monster):
     def __init__(self, game):
         super().__init__(game, 'alien', (300, 300), offset = 130)
@@ -61,3 +66,5 @@ class Alien(Monster):
         self.max_health = health
         self.attack = 0.5
         self.speed = random.randint(1, 2)
+        self.set_loot_amount(80)
+
