@@ -2,11 +2,12 @@
 import pygame 
 from pygame import * #a retirer
 from player import Player
-from monster import Monster
+from monster import *
 from comet_event import CometFallEvent
 import math
 import random
 
+FPS = 60
 class Game:
     def __init__(self):
         self.is_playing = False # definir si le jeu a commencé ou pas
@@ -25,7 +26,8 @@ class Game:
     def start(self):
         self.is_playing = True
         for monster in range(2):
-            self.spawn_monster()
+            self.spawn_monster(Mummy)
+        self.spawn_monster(Alien)
         
     def game_over(self): # remettre le jeu à neuf
         self.all_monsters = pygame.sprite.Group() 
@@ -50,8 +52,8 @@ class Game:
     def check_collision(self, sprite, group):
         return pygame.sprite.spritecollide(sprite, group, False, pygame.sprite.collide_mask)
     
-    def spawn_monster(self):
-        self.all_monsters.add(Monster(self))
+    def spawn_monster(self, monster_class_name):
+        self.all_monsters.add(monster_class_name.__call__(self)) # instancie la Class en fonction du parametre de la fonction
         
     def walls(self, direction):
         if direction == 'right':
@@ -114,5 +116,5 @@ class Game:
                     if self.play_button_rect.collidepoint(event.pos):
                         self.start() # lancer le jeu
                         
-            clock.tick(60) #SET FPS
+            clock.tick(FPS) #SET FPS
         pygame.quit() #Quit

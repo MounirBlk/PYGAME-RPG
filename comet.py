@@ -2,6 +2,7 @@
 import pygame 
 from pygame import * #a retirer
 import random
+from monster import *
 
 class Comet(pygame.sprite.Sprite):
     def __init__(self, comet_event):
@@ -18,8 +19,7 @@ class Comet(pygame.sprite.Sprite):
         self.comet_event.all_comets.remove(self)
         if len(self.comet_event.all_comets) == 0: # check si le nb de comets est a 0
             self.comet_event.reset_percent()
-            for i in range(2):
-                self.comet_event.game.spawn_monster()
+            self.comet_event.game.start()
         
     def fall(self):
         self.rect.y += self.speed

@@ -5,8 +5,8 @@ import random
 import math
 import animation
 class Monster(animation.AnimateSprite):
-    def __init__(self, game):
-        super().__init__('mummy')
+    def __init__(self, game, name, size, offset = 0):
+        super().__init__(name, size)
         self.game = game
         health = 100
         self.health = health
@@ -14,18 +14,22 @@ class Monster(animation.AnimateSprite):
         self.attack = 0.3
         self.rect = self.image.get_rect()
         self.rect.x = math.ceil(self.game.screen.get_width() * 0.9) - random.randint(0, 150)
-        self.rect.y = math.ceil(self.game.player.rect.y + (self.game.player.rect.y / 12.5))
+        self.rect.y = math.ceil(self.game.player.rect.y + (self.game.player.rect.y / 12.5)) - offset
         self.speed = random.randint(2, 4)
         self.start_animation()
         
     def get_damage(self, amount):
         self.health -= amount # infliger des dégats au monstre
         if self.health <= 0: # verifier le nombre de points de vie
-            # reapparaitre comme un nouveau monstre (possibilité de supprimer le monstre avec self.player.all_monsters.remove(self) # supprimer le monstre )
-            self.rect.x = math.ceil(self.game.screen.get_width() * 0.9) - random.randint(0, 150)
+            # reapparaitre comme un nouveau monstre (possibilité de supprimer le monstre avec self.game.all_monsters.remove(self))
+            '''self.rect.x = math.ceil(self.game.screen.get_width() * 0.9) - random.randint(0, 150)
             self.rect.y = math.ceil(self.game.player.rect.y + (self.game.player.rect.y / 12.5))
             self.health = self.max_health
-            self.speed = random.randint(2, 3)
+            self.speed = random.randint(2, 3)'''
+            self.game.all_monsters.remove(self)
+            tabTypeMonstersClass = [Mummy, Alien]
+            typeMonsterClass = tabTypeMonstersClass[random.randint(0, len(tabTypeMonstersClass) - 1)]
+            self.game.spawn_monster(typeMonsterClass)
             
             if self.game.comet_event.is_full_loaded(): # check si la barre d'evement de comet est chargé
                 self.game.all_monsters.remove(self)
@@ -45,3 +49,15 @@ class Monster(animation.AnimateSprite):
             self.game.player.get_damage(self.attack)
             #infliger des dégats au player si le monstre est en collision
 
+class Mummy(Monster):
+    def __init__(self, game):
+        super().__init__(game, 'mummy', (130, 130))
+        
+class Alien(Monster):
+    def __init__(self, game):
+        super().__init__(game, 'alien', (300, 300), offset = 130)
+        health = 250
+        self.health = health
+        self.max_health = health
+        self.attack = 0.5
+        self.speed = random.randint(1, 2)
