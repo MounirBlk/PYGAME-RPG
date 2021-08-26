@@ -3,18 +3,20 @@ import pygame
 from pygame import * #a retirer
 import random
 import math
-class Monster(pygame.sprite.Sprite):
+import animation
+class Monster(animation.AnimateSprite):
     def __init__(self, game):
-        super().__init__()
+        super().__init__('mummy')
         self.game = game
-        self.health = 100
-        self.max_health = 100
+        health = 100
+        self.health = health
+        self.max_health = health
         self.attack = 0.3
-        self.image = pygame.image.load('assets/mummy.png')
         self.rect = self.image.get_rect()
         self.rect.x = math.ceil(self.game.screen.get_width() * 0.9) - random.randint(0, 150)
         self.rect.y = math.ceil(self.game.player.rect.y + (self.game.player.rect.y / 12.5))
         self.speed = random.randint(2, 4)
+        self.start_animation()
         
     def get_damage(self, amount):
         self.health -= amount # infliger des dégats au monstre
@@ -29,6 +31,8 @@ class Monster(pygame.sprite.Sprite):
                 self.game.all_monsters.remove(self)
                 self.game.comet_event.attempt_fall() # declencher la pluie de cometes
 
+    def update_animation(self):
+        self.animate(loop = True) # method from Class AnimateSprite -> animation.py
         
     def update_health_bar(self, surface):
         pygame.draw.rect(surface, (60, 63, 60), [self.rect.x + 10, self.rect.y - 15, self.max_health, 5]) # dessine le bg de la barre de vie

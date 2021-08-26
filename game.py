@@ -71,12 +71,14 @@ class Game:
         self.screen.blit(self.player.image, self.player.rect) #appliquer l'image du player
         self.player.update_health_bar(self.screen) # actualiser la bar de vie du joueur
         self.comet_event.update_bar(self.screen) # actualiser la barre d'evenement du jeu
+        self.player.update_animation() # actualiser l'animation du player
         
         for projectile in self.player.all_projectiles:
             projectile.move() # mouvement des projectiles
         for monster in self.all_monsters:
             monster.forward() # avancement des monstres
             monster.update_health_bar(self.screen) # update de la bare de vie
+            monster.update_animation() # animation du sprite
         for comet in self.comet_event.all_comets:
             comet.fall() # avancement des monstres
 
