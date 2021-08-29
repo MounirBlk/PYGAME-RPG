@@ -8,7 +8,7 @@ class CometFallEvent:
     def __init__(self, game):
         self.game = game
         self.percent = 0
-        self.percent_speed = 50
+        self.percent_speed = 10
         self.all_comets = pygame.sprite.Group() # definir un groupe de sprite pour les cometes
         self.fall_mode = False
         
@@ -24,6 +24,7 @@ class CometFallEvent:
         if self.is_full_loaded() and len(self.game.all_monsters) == 0: # la jauge d'evement est totalement chargé
             self.comet_fall()
             self.fall_mode = True # Activation les comets
+            self.game.num_max_monsters += 1
             
     def update_bar(self, surface):
         self.add_percent()

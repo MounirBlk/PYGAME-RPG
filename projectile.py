@@ -14,9 +14,10 @@ class Projectile(pygame.sprite.Sprite):
         self.rect.y = player.rect.y + 80
         self.origin_image = self.image
         self.angle = 0
-        
+        self.max_attack_pos_x = self.rect.x + 500
+
     def rotate(self):
-        self.angle += 12
+        self.angle += 6
         self.image = pygame.transform.rotozoom(self.origin_image, self.angle, 1) # tourner le projectile
         self.rect = self.image.get_rect(center = self.rect.center)
         
@@ -24,8 +25,10 @@ class Projectile(pygame.sprite.Sprite):
         self.player.all_projectiles.remove(self) # supprimer le projectile 
         
     def move(self):
-        self.rect.x += self.speed # deplacement du projectile
+        self.rect.x += self.speed # deplacement du projectile        
         self.rotate()
+        if self.rect.x > self.max_attack_pos_x:# le projectile disparait lorsque la pos max est dépassé
+            self.remove()
         for monster in self.player.game.check_collision(self, self.player.game.all_monsters): # verifier si le projectile entre en collision avec un monstre
             self.remove() 
             monster.get_damage(self.player.attack) # infliger des dégats aux monstres

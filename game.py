@@ -23,26 +23,28 @@ class Game:
         self.comet_event = CometFallEvent(self) # evenement des comets
         self.all_monsters = pygame.sprite.Group() # groupe de monstres
         self.sound_manager = SoundManager() # Sound
-        self.font = pygame.font.Font('assets/fonts//PottaOne-Regular.ttf', 25) # pygame.font.SysFont('Arial', 16) 
+        self.font = pygame.font.Font('assets/fonts/PottaOne-Regular.ttf', 25) # pygame.font.SysFont('Arial', 16) 
         self.score = 0
         self.pressed = {}
+        self.num_max_monsters = 2
         
     def start(self):
         self.is_playing = True
-        for monster in range(2):
+        for monster in range(self.num_max_monsters):
             self.spawn_monster(Mummy)
         self.spawn_monster(Alien)
         
     def add_score(self, points = 10):
         self.score += points
         
-    def game_over(self): # remettre le jeu à neuf
+    def game_over(self): # remettre le jeu à zero
         self.all_monsters = pygame.sprite.Group() 
         self.comet_event.all_comets = pygame.sprite.Group() 
         self.player.health = self.player.max_health
         self.comet_event.reset_percent()
         self.is_playing = False
         self.score = 0
+        self.num_max_monsters = 2
         self.sound_manager.play('game_over')
         
     def init_menu(self):
@@ -77,6 +79,10 @@ class Game:
             self.player.move('right')
         elif self.pressed.get(pygame.K_LEFT) and self.walls('left'):
             self.player.move('left')
+        elif (self.pressed.get(pygame.K_RCTRL) or self.pressed.get(pygame.K_LCTRL)) and self.pressed.get(pygame.K_m):
+            self.player.health = self.player.max_health
+        else:
+            pass
             
     def update(self):
         score_text = self.font.render(f'Score : {self.score}', 1, (255, 255, 255)) # Afficher le score sur l'ecran
@@ -116,7 +122,7 @@ class Game:
                     running = False
                 elif event.type == pygame.KEYDOWN: #touche appuyé
                     self.pressed[event.key] = True
-                    if event.key == pygame.K_SPACE: 
+                    if event.key == pygame.K_SPACE: #  or event.key == pygame.K_RETURN
                         if self.is_playing:
                             if not self.pressed.get(pygame.K_RIGHT) or not self.pressed.get(pygame.K_LEFT):
                                 self.player.launch_projectile() # lancement du projectile
