@@ -17,7 +17,7 @@ class Monster(animation.AnimateSprite):
         self.rect.y = math.ceil(self.game.player.rect.y + (self.game.player.rect.y / 12.5)) - offset
         self.loot_amount = 10
         self.speed = random.randint(2, 4)
-        self.start_animation()
+        self.start_animation() # method from Class AnimateSprite -> animation.py
     
     def set_loot_amount(self, amount):
         self.loot_amount = amount
